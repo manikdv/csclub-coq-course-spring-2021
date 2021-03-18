@@ -83,20 +83,13 @@ natural numbers `m` and `n` and returns the result of subtracting `n` from `m`.
 E.g. `subn 5 3` returns `2`. Write some unit tests. |*)
 
 Fixpoint subn (m n : nat) {struct m} : nat :=
-  match n with
-  | S n' => match m with
-            | S m' => subn m' n'
-            | _ => m
+  match m with
+  | S m' => match n with
+            | S n' => subn m' n'
+            | O => m
             end
-  | _ => m
+  | O => m
   end.
-
-
-(* Fixpoint subn (m n : nat) {struct m} : nat :=
-  match (m, n) with
-  | (S m', S n') => subn m' n'
-  | _ => m
-  end. *)
 
 Eval cbv beta delta iota in subn (S (S (S (S O)))) (S O).
 
@@ -173,12 +166,42 @@ for it. |*)
 
 (* Fixpoint divn (m n : nat) {struct m} : nat := *)
 
-Fixpoint divn (m n : nat) {struct m} : nat :=
-  if leq m n is false then S (divn (subn m n) n) else O.
+(* Fixpoint subn' (m n : nat) {struct m} : nat :=
+  if m is S m' then
+    if n is S n' then S (subn' m' n') else m
+  else m. *)
 
-Compute divn O O.
-Compute divn (S (S O)) O.
-Compute divn O (S (S O)).
-Compute divn (S (S O)) (S (S O)).
-Compute divn (S (S (S (S O)))) (S (S O)).
+Fixpoint divn (m n : nat) : nat :=
+  match n with
+  | S n' => match subn m n' with
+            | S m' => S (divn m' n)
+            | O => O
+            end
+  | O => O
+  end.
+
+Definition n0 := O.
+Definition n1 := S n0.
+Definition n2 := S n1.
+Definition n3 := S n2.
+Definition n4 := S n3.
+Definition n5 := S n4.
+Definition n6 := S n5.
+Definition n7 := S n6.
+Definition n8 := S n7.
+Definition n9 := S n8.
+Definition n10 := S n9.
+
+
+Check eq_refl : divn n9 n5 = n1.
+Check eq_refl : divn n9 n4 = n2.
+
+Check eq_refl : divn n0 n0 = n0.
+Check eq_refl : divn n4 n2 = n2.
+Check eq_refl : divn n3 n2 = n1.
+Check eq_refl : divn n2 n2 = n1.
+Check eq_refl : divn n2 n3 = n0.
+Check eq_refl : divn n4 n0 = n0.
+Check eq_refl : divn n0 n4 = n0.
+
 End My.
